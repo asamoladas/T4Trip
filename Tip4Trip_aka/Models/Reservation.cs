@@ -22,7 +22,9 @@ namespace Tip4Trip_aka.Models
         
         public int Occupants { get; set; }
 
-        public DateTime DateOfBooking { get; set; }
+       public DateTime DateOfBooking { get; set; }
+
+
         public string CustommerComments { get; set; }
         public double PricePerNightCharged { get; set; }
 

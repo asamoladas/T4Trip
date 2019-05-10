@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
@@ -9,14 +11,17 @@ namespace Tip4Trip_aka.Models
 {
     public class House
     {
-
+        //ApplicationUser user = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId());
+        private string ownerId = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId()).Id;
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Please, provide a title")]
         [StringLength(250)]
         public string Title { get; set; }
         public ApplicationUser Owner { get; set; }
-        public string OwnerId { get; set; }
+
+        public string OwnerId { get { return ownerId; } set { ownerId = value; } }
+
         public string Address { get; set; }
         public string Description { get; set; }
         //public DateTime Start_date { get; set; }

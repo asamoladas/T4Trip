@@ -10,7 +10,7 @@ using Tip4Trip_aka.Models;
 
 namespace Tip4Trip_aka.Controllers
 {
-    [Authorize(Roles ="Admin")]
+   // [Authorize(Roles ="Admin")]
     public class LocationsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();

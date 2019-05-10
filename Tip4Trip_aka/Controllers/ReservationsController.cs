@@ -10,7 +10,7 @@ using Tip4Trip_aka.Models;
 
 namespace Tip4Trip_aka.Controllers
 {
-    [Authorize]
+   // [Authorize]
     public class ReservationsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -41,6 +41,7 @@ namespace Tip4Trip_aka.Controllers
         public ActionResult Create()
         {
             ViewBag.HouseId = new SelectList(db.Houses, "Id", "Title");
+
             return View();
         }
 

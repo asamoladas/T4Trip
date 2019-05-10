@@ -10,7 +10,7 @@ using Tip4Trip_aka.Models;
 
 namespace Tip4Trip_aka.Controllers
 {
-    [Authorize]
+   // [Authorize]
     public class ManageController : Controller
     {
         private ApplicationSignInManager _signInManager;

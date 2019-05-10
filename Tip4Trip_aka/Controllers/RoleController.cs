@@ -9,7 +9,7 @@ using Tip4Trip_aka.Models;
 
 namespace Tip4Trip_aka.Controllers
 {
-    [Authorize(Roles = "Admin")]
+   // [Authorize(Roles = "Admin")]
     public class RoleController : Controller
     {
         private ApplicationRoleManager _roleManager;

@@ -4,78 +4,352 @@
 
 @model Tip4Trip_aka.ViewModels.HousesDates
 
-<br /><br />
-<body id="home-back-img">
-</body>
+<head>
+    <script>
+        $(function () {
+            var dateFormat = "mm/dd/yy",
+                from = $("#Sstartdate")
+                    .datepicker({
+                        defaultDate: "+1w",
+                        changeMonth: true,
+                        numberOfMonths: 2
+                    })
+                    .on("change", function () {
+                        to.datepicker("option", "minDate", getDate(this));
+                    }),
+                to = $("#Enddate").datepicker({
+                    defaultDate: "+1w",
+                    changeMonth: true,
+                    numberOfMonths: 2
+                })
+                    .on("change", function () {
+                        from.datepicker("option", "maxDate", getDate(this));
+                    });
+
+            function getDate(element) {
+                var date;
+                try {
+                    date = $.datepicker.parseDate(dateFormat, element.value);
+                } catch (error) {
+                    date = null;
+                }
+
+                return date;
+            }
+        });
+    </script>
+    <script>
+        $(function () {
+            $.widget("custom.combobox", {
+                _create: function () {
+                    this.wrapper = $("<span>")
+                        .addClass("custom-combobox")
+                        .insertAfter(this.element);
+
+                    this.element.hide();
+                    this._createAutocomplete();
+                    this._createShowAllButton();
+                },
+
+                _createAutocomplete: function () {
+                    var selected = this.element.children(":selected"),
+                        value = selected.val() ? selected.text() : "";
+
+                    this.input = $("<input>")
+                        .appendTo(this.wrapper)
+                        .val(value)
+                        .attr("title", "")
+                        .attr("placeholder", "Search with Location...")
+                        .addClass("custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left")
+                        .autocomplete({
+                            delay: 0,
+                            minLength: 0,
+                            source: $.proxy(this, "_source")
+                        })
+                        .tooltip({
+                            classes: {
+                                "ui-tooltip": "ui-state-highlight"
+                            }
+                        });
+
+                    this._on(this.input, {
+                        autocompleteselect: function (event, ui) {
+                            ui.item.option.selected = true;
+                            this._trigger("select", event, {
+                                item: ui.item.option
+                            });
+                        },
+
+                        autocompletechange: "_removeIfInvalid"
+                    });
+                },
+
+                _createShowAllButton: function () {
+                    var input = this.input,
+                        wasOpen = false;
+
+                    $("<a>")
+                        .attr("tabIndex", -1)
+                        .attr("title", "Show all available locations")
+                        .tooltip()
+                        .appendTo(this.wrapper)
+                        .button({
+                            icons: {
+                                primary: "ui-icon-triangle-1-s"
+                            },
+                            text: false
+                        })
+                        .removeClass("ui-corner-all")
+                        .addClass("custom-combobox-toggle ui-corner-right")
+                        .on("mousedown", function () {
+                            wasOpen = input.autocomplete("widget").is(":visible");
+                        })
+                        .on("click", function () {
+                            input.trigger("focus");
+
+                            // Close if already visible
+                            if (wasOpen) {
+                                return;
+                            }
+
+                            // Pass empty string as value to search for, displaying all results
+                            input.autocomplete("search", "");
+                        });
+                },
+
+                _source: function (request, response) {
+                    var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
+                    response(this.element.children("option").map(function () {
+                        var text = $(this).text();
+                        if (this.value && (!request.term || matcher.test(text)))
+                            return {
+                                label: text,
+                                value: text,
+                                option: this
+                            };
+                    }));
+                },
+
+                _removeIfInvalid: function (event, ui) {
+
+                    // Selected an item, nothing to do
+                    if (ui.item) {
+                        return;
+                    }
+
+                    // Search for a match (case-insensitive)
+                    var value = this.input.val(),
+                        valueLowerCase = value.toLowerCase(),
+                        valid = false;
+                    this.element.children("option").each(function () {
+                        if ($(this).text().toLowerCase() === valueLowerCase) {
+                            this.selected = valid = true;
+                            return false;
+                        }
+                    });
+
+                    // Found a match, nothing to do
+                    if (valid) {
+                        return;
+                    }
+
+                    // Remove invalid value
+                    this.input
+                        .val("")
+                        .attr("title", value + " didn't match any item")
+                        .tooltip("open");
+                    this.element.val("");
+                    this._delay(function () {
+                        this.input.tooltip("close").attr("title", "");
+                    }, 2500);
+                    this.input.autocomplete("instance").term = "";
+                },
+
+                _destroy: function () {
+                    this.wrapper.remove();
+                    this.element.show();
+                }
+            });
+
+            $("#combobox").combobox();
+            $("#toggle").on("click", function () {
+                $("#combobox").toggle();
+            });
+        });
+    </script>
+    @*<script>
+            $(function () {
+                var availableTags = [
+                    "Kalamaria",
+                    "Evosmos",
+                    "Ampelokipoi",
+                    "Thessaloniki",
+                    "Harilaou",
+                    "Toumba",
+                    "Halkidiki",
+                    "Kozani"
+                ];
+                $("#locationsearch").autocomplete({
+                    source: availableTags
+                });
+            });
+        </script>*@
+
+    @*<script>
+            $(function () {
+                $("#speed").selectmenu();
+            });
+        </script>*@
+
+</head>
+@*<style>
+        fieldset {
+            border: 0;
+        }
+
+        label {
+            display: block;
+            margin: 30px 0 0 0;
+        }
+
+        .overflow {
+            height: 200px;
+        }
+    </style>*@
 <style>
-    .center {
-        text-align: right;
+    .custom-combobox {
+        position: relative;
+        display: inline-block;
+    }
+
+    .custom-combobox-toggle {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        margin-left: -1px;
+        padding: 0;
+    }
+
+    .custom-combobox-input {
+        margin: 1;
+        padding: 5px 5px;
     }
 </style>
-@using (Html.BeginForm("Index", "Home", FormMethod.Get))
-{
-<div class="center">
-    @Html.TextBox("searching", null, new { @class = "form-control", @placeholder = "Search With Location Name" })
-    @Html.TextBox("Address", null, new { @class = "form-control", @placeholder = "Search With Address" })
-    @Html.TextBox("Sstartdate", null, new { @class = "form-control", @placeholder = "Search With Start Date" })
-    @Html.TextBox("Enddate", null, new { @class = "form-control", @placeholder = "Search With End Date" })
-    <input type="submit" value="T4Trip Search" />
-</div>
-}
-<table class="table table-striped">
+<body>
 
-    <thead>
-        <tr>
-            <th>House ID</th>
-            <th>House Municipality</th>
-            <th>House Location</th>
-            <th>House Address</th>
-            <th>House Max Occupancy</th>
-            <th>Cost Per Night</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model.houses.Count() == 0)
-        {
-            <tr>
-                <td colspan="3" style="color:red">
-                    No match
-                </td>
-            </tr>
+
+    @*<body id="home-back-img">
+        </body>*@
+
+    @*<style>
+        .center {
+            text-align: right;
         }
-        else
-        {
-            foreach (Tip4Trip_aka.Models.House item in Model.houses)
-            {
-                <tr>
-                    <td>@item.Title</td>
-                    <td>@item.Location.NameMunicipality</td>
-                    <td>@item.Location.NameCity</td>
-                    <td>@item.Address </td>
-                    <td>@item.MaxOccupancy</td>
-                    <td>@item.PriceperNight</td>
-                    <td>@Html.ActionLink("Availability", "mazi", "Houses", new { idilicious = item.Id }, null)</td>
-                    <td>@Html.ActionLink("Book me now !", "Create", "Reservations")</td>
-                </tr>
-                if (Model.reservations.Where(mn => mn.HouseId == item.Id).Count() ==0)
-                {
-                <th>Available !!</th> }
-            foreach (Tip4Trip_aka.Models.Reservation itemres in Model.reservations.Where(mn => mn.HouseId == item.Id))
-            {
+    </style>*@
 
+    @*@using (Html.BeginForm("Index", "Home", FormMethod.Get))
+        {
+            <div class="center">
+                @Html.TextBox("searching", null, new { @class = "form-control", @placeholder = "Search With Location Name" })*@
+    @*@Html.TextBox("Address", null, new { @class = "form-control", @placeholder = "Search With Address" })*@
+    @*@Html.TextBox("Sstartdate", null, new { @type = "date", @class = "form-control", @placeholder = "Search With Start Date" })
+
+                @Html.TextBox("Enddate", null, new { @type = "date", @class = "form-control", @placeholder = "Search With End Date" })
+                <input type="submit" value="T4Trip Search" />
+            </div>
+        }*@
+
+
+
+    <form method="GET">
+        @*<input type="text" id="locationsearch" placeholder="Search with location..." name="searching" />*@
+        <div class="ui-widget">
+            <select id="combobox" name="searching" placeholder="Search with location...">
+                <option value="">Select your option</option>
+                <option value="Kalamaria">Kalamaria</option>
+                <option value="Evosmos">Evosmos</option>
+                <option value="Ampelokipoi">Ampelokipoi</option>
+                <option value="Kozani">Kozani</option>
+                <option value="Trikala">Trikala</option>
+            </select>
+            </div>
+        <br />
+        <div class="container">
+            <input type="text" id="Sstartdate" name="Sstartdate" placeholder="Check In">
+            <input type="text" id="Enddate" name="Enddate" placeholder="Check Out">
+            @*<label for="occupantsearch">Number of Occupants</label>*@
+            <input type="number" id="occupantsearch" name="occupantsearch" placeholder="Number of Occupants" min="1" max="10">
+
+            @*<label for="speed">Select a speed</label>
+        <select name="searching" id="speed">
+            <option selected="selected">Search Location</option>
+            <option>Kalamaria</option>
+            <option>Evosmos</option>
+            <option>Fast</option>
+            <option>Faster</option>
+        </select>*@
+            <br />
+            <br />
+            <input type="submit" class="btn btn-primary" value="T4Trip Search" />
+        </div>
+</form>
+    <table class="table table-striped">
+
+        <thead>
+            <tr>
+                <th>House ID</th>
+                <th>House Municipality</th>
+                <th>House Location</th>
+                <th>House Address</th>
+                <th>House Max Occupancy</th>
+                <th>Cost Per Night</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.houses.Count() == 0)
+            {
                 <tr>
-                    <td>@item.Title</td>
-                    <th>It is Reserved</th>
-                    <td>@itemres.StartDate</td>
-                    <td>@itemres.EndDate</td>
-                    <br />
+                    <td colspan="3" style="color:red">
+                        No match
+                    </td>
                 </tr>
             }
+            else
+            {
+                foreach (Tip4Trip_aka.Models.House item in Model.houses)
+                {
+                    <tr>
+                        <td>@item.Title</td>
+                        <td>@item.Location.NameMunicipality</td>
+                        <td>@item.Location.NameCity</td>
+                        <td>@item.Address </td>
+                        <td>@item.MaxOccupancy</td>
+                        <td>@item.PriceperNight</td>
+                        <td>@Html.ActionLink("Availability", "mazi", "Houses", new { idilicious = item.Id }, null)</td>
+                        <td>@Html.ActionLink("Book me now !", "Create", "Reservations")</td>
+
+                    </tr>
+                    if (Model.reservations.Where(mn => mn.HouseId == item.Id).Count() == 0)
+                    {
+                    <tr>Available !!</tr> }
+                foreach (Tip4Trip_aka.Models.Reservation itemres in Model.reservations.Where(mn => mn.HouseId == item.Id))
+                {
+
+                    <tr>
+                        <td>@item.Title</td>
+                        <th>It is Reserved</th>
+                        <td>@itemres.StartDate</td>
+                        <td>@itemres.EndDate</td>
+
+                    </tr>
+                }
+            }
+
+
+
         }
+            </tbody>
+        </table>
+    </body>
 
 
-
-    }
-        </tbody>
-    </table>
-</body>

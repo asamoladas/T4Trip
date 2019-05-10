@@ -6,6 +6,13 @@
     <title>@ViewBag.Title - Tip4Trip - Your Vacation Friend</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    @Styles.Render("~/Content/themes/base/css")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/jqueryui")
+    @RenderSection("scripts", required: false)
+    <link rel="stylesheet" href="@Url.Content("~/Content/themes/base/jquery-ui.css")" />
+    @*<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">*@
     <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
@@ -38,27 +45,27 @@
                     <li class="nav-item m-lg-3">@Html.ActionLink("Home", "Index", "Home")</li>
                     <li class="nav-item m-lg-3">@Html.ActionLink("About", "About", "Home")</li>
                     <li class="nav-item m-lg-3">@Html.ActionLink("Contact", "Contact", "Home")</li>
-                   
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        <li class="nav-item m-lg-3"> @Html.ActionLink("Houses", "Index", "Houses")</li>
-                        <li class="nav-item m-lg-3">
-                            @Html.ActionLink("Reservations", "Index", "Reservations")
-                        </li>
 
-                        if (User.IsInRole("Admin"))
-                        {
-                            
+                    @*@if (User.Identity.IsAuthenticated)
+                        {*@
+                    <li class="nav-item m-lg-3"> @Html.ActionLink("Houses", "Index", "Houses")</li>
+                    <li class="nav-item m-lg-3">
+                        @Html.ActionLink("Reservations", "Index", "Reservations")
+                    </li>
 
-                            <li class="nav-item m-lg-3">
-                                @Html.ActionLink("Locations", "Index", "Locations")
-                            </li>
+                    @*if (User.IsInRole("Admin"))
+                        {*@
 
-                            <li class="nav-item m-lg-3">
-                                @Html.ActionLink("mazi", "mazi", "Houses", new { idilicious = 2 }, null)
-                            </li>
-                        }
-                    }
+
+                    <li class="nav-item m-lg-3">
+                        @Html.ActionLink("Locations", "Index", "Locations")
+                    </li>
+
+                    <li class="nav-item m-lg-3">
+                        @Html.ActionLink("mazi", "mazi", "Houses", new { idilicious = 2 }, null)
+                        @*</li>
+                                }
+                            }*@
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>
@@ -75,8 +82,6 @@
             <p>&copy; @DateTime.Now.Year - Tip4Trip App</p>
         </footer>
     </div>
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    @RenderSection("scripts", required: false)
+   
 </body>
 </html>
